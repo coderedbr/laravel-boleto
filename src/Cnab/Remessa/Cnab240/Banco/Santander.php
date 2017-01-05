@@ -27,6 +27,13 @@ class Santander extends AbstractRemessa implements RemessaContract
     const CH_CHEQUE = 97;
     const ND_NOTA_PROMISSORIA_DIRETA = 98;
 
+    public function __construct(array $params = [])
+    {
+        parent::__construct($params);
+        $this->addCampoObrigatorio('codigoCliente');
+    }
+
+
     /**
      * Código do banco
      *
@@ -148,7 +155,7 @@ class Santander extends AbstractRemessa implements RemessaContract
         $this->add(61, 61, ''); // Reservado (Uso Banco)
         $this->add(62, 62, ''); // Reservado (Uso Banco)
         //
-        $this->add(63, 77, Util::formatCnab(9, $boleto->getNumero(), 15)); // Seu Número
+        $this->add(63, 77, Util::formatCnab(9, $boleto->getNumeroControle(), 15)); // Seu Número
         $this->add(78, 85, $boleto->getDataVencimento()->format('dmY')); // Data de vencimento do título
         $this->add(86, 100, Util::formatCnab(9, $boleto->getValor(), 15, 2)); // Valor nominal do título
         $this->add(101, 104, Util::formatCnab(9, 0, 4)); //Agência encarregada da cobrança
@@ -218,15 +225,6 @@ class Santander extends AbstractRemessa implements RemessaContract
         $this->add(218, 221, Util::formatCnab(9, 0, 3)); // Número do plano
         $this->add(218, 240, ''); // Reservado (Uso Banco)
 
-    }
-
-    public function isValid()
-    {
-        if (empty($this->getCodigoCliente()) || !parent::isValid()) {
-            return false;
-        }
-
-        return true;
     }
 
     protected function header()

@@ -11,13 +11,6 @@ use Eduardokum\LaravelBoleto\Util;
 class Banrisul extends AbstractRemessa implements RemessaContract
 {
 
-    /**
-     * Valor total dos titulos
-     *
-     * @var int
-     */
-    private $valorTotal = 0;
-
     const TIPO_COBRANCA_DIRETA = '04';
     const TIPO_COBRANCA_ESCRITURAL = '06';
     const TIPO_COBRANCA_CREDENCIADA = '08';
@@ -51,6 +44,19 @@ class Banrisul extends AbstractRemessa implements RemessaContract
     const OCORRENCIA_ALT_PAGADOR_CEP = '21';
     const OCORRENCIA_ACERTO_RATEIO_CREDITO = '68';
     const OCORRENCIA_CANC_RATEIO_CREDITO = '69';
+
+    public function __construct(array $params = [])
+    {
+        parent::__construct($params);
+        $this->addCampoObrigatorio('codigoCliente');
+    }
+
+    /**
+     * Valor total dos titulos
+     *
+     * @var int
+     */
+    private $valorTotal = 0;
 
     /**
      * Código do banco
@@ -189,6 +195,7 @@ class Banrisul extends AbstractRemessa implements RemessaContract
 
     /**
      * @return $this
+     * @throws \Exception
      */
     protected function header()
     {
@@ -228,7 +235,9 @@ class Banrisul extends AbstractRemessa implements RemessaContract
 
     /**
      * @param BoletoContract $boleto
+     *
      * @return bool
+     * @throws \Exception
      */
     public function addBoleto(BoletoContract $boleto)
     {
@@ -239,7 +248,7 @@ class Banrisul extends AbstractRemessa implements RemessaContract
         $this->add(2, 17, '');
         $this->add(18, 30, Util::formatCnab('9', $this->getCodigoCliente(), 13, '0'));
         $this->add(31, 37, '');
-        $this->add(38, 62, Util::formatCnab('X', $boleto->getNumero(), 25));
+        $this->add(38, 62, Util::formatCnab('X', $boleto->getNumeroControle(), 25));
         $this->add(63, 72, Util::formatCnab('9L', $boleto->getNossoNumero(), 10));
         $this->add(73, 104, '');
         $this->add(105, 107, '');
@@ -318,22 +327,6 @@ class Banrisul extends AbstractRemessa implements RemessaContract
 
         return $this;
     }
-
-    /**
-     * @return bool
-     */
-    public function isValid()
-    {
-        if ($this->getCodigoCliente() == ''
-            || ($this->isCarteiraRSX() && $this->getCodigoCliente() == '')
-            || !parent::isValid()
-        ) {
-            return false;
-        }
-
-        return true;
-    }
-
 
     /**
      * Verifica se a carteira é uma das seguintes : R, S, X ou alguma a mais passada por parametro

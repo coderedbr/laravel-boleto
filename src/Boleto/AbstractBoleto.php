@@ -13,8 +13,20 @@ use Eduardokum\LaravelBoleto\Util;
  *
  * @package Eduardokum\LaravelBoleto\Boleto
  */
-abstract class AbstractBoleto
+abstract class AbstractBoleto implements BoletoContract
 {
+
+    /**
+     * Campos que são necessários para o boleto
+     *
+     * @var array
+     */
+    private $camposObrigatorios = [
+        'numero',
+        'agencia',
+        'conta',
+        'carteira',
+    ];
 
     /**
      * Código do banco
@@ -133,7 +145,7 @@ abstract class AbstractBoleto
     /**
      * Espécie do documento, coódigo para remessa
      *
-     * @var string
+     * @var array
      */
     protected $especiesCodigo = [];
     /**
@@ -148,6 +160,12 @@ abstract class AbstractBoleto
      * @var int
      */
     protected $numero;
+    /**
+     * Define o número definido pelo cliente para controle da remessa
+     *
+     * @var string
+     */
+    protected $numeroControle;
     /**
      * Campo de uso do banco no boleto
      *
@@ -304,6 +322,33 @@ abstract class AbstractBoleto
         }
     }
 
+    /**
+     * Seta os campos obrigatórios
+     *
+     * @return $this
+     */
+    protected function setCamposObrigatorios() {
+        $args = func_get_args();
+        $this->camposObrigatorios = [];
+        foreach ($args as $arg) {
+            $this->addCampoObrigatorio($arg);
+        }
+        return $this;
+    }
+
+    /**
+     * Adiciona os campos obrigatórios
+     *
+     * @return $this
+     */
+    protected function addCampoObrigatorio() {
+        $args = func_get_args();
+        foreach ($args as $arg) {
+            !is_array($arg) || call_user_func_array([$this, __FUNCTION__], $arg);
+            !is_string($arg) || array_push($this->camposObrigatorios, $arg);
+        }
+        return $this;
+    }
     /**
      * Define a agência
      *
@@ -571,6 +616,8 @@ abstract class AbstractBoleto
     /**
      * Retorna o codigo da Espécie Doc
      *
+     * @param int $default
+     *
      * @return string
      */
     public function getEspecieDocCodigo($default = 99)
@@ -597,7 +644,7 @@ abstract class AbstractBoleto
     /**
      * Retorna o campo Número do documento
      *
-     * @return int
+     * @return string
      */
     public function getNumeroDocumento()
     {
@@ -626,6 +673,30 @@ abstract class AbstractBoleto
     public function getNumero()
     {
         return $this->numero;
+    }
+
+    /**
+     * Define o número  definido pelo cliente para controle da remessa
+     *
+     * @param  string $numeroControle
+     *
+     * @return AbstractBoleto
+     */
+    public function setNumeroControle($numeroControle)
+    {
+        $this->numeroControle = $numeroControle;
+
+        return $this;
+    }
+
+    /**
+     * Retorna o número definido pelo cliente para controle da remessa
+     *
+     * @return int
+     */
+    public function getNumeroControle()
+    {
+        return $this->numeroControle;
     }
 
     /**
@@ -1026,7 +1097,8 @@ abstract class AbstractBoleto
      */
     public function setDiasBaixaAutomatica($baixaAutomatica)
     {
-        throw new \Exception('O Banco ' . basename(get_class($this)) . ' não suporta baixa automática');
+        $exception = sprintf('O banco %s não suporta baixa automática, pode usar também: setDiasProtesto(%s)', basename(get_class($this)), $baixaAutomatica);
+        throw new \Exception($exception);
     }
 
     /**
@@ -1311,14 +1383,11 @@ abstract class AbstractBoleto
      */
     public function isValid()
     {
-        if ($this->numeroDocumento == ''
-            || $this->agencia == ''
-            || $this->conta == ''
-            || $this->carteira == ''
-        ) {
-            return false;
+        foreach ($this->camposObrigatorios as $campo) {
+            if(call_user_func([$this, 'get' . ucwords($campo)]) == '') {
+                return false;
+            }
         }
-
         return true;
     }
 
@@ -1500,7 +1569,9 @@ abstract class AbstractBoleto
                 'demonstrativo'               => $this->getDescricaoDemonstrativo(),
                 'instrucoes'                  => $this->getInstrucoes(),
                 'local_pagamento'             => $this->getLocalPagamento(),
+                'numero'                      => $this->getNumero(),
                 'numero_documento'            => $this->getNumeroDocumento(),
+                'numero_controle'             => $this->getNumeroControle(),
                 'agencia_codigo_beneficiario' => $this->getAgenciaCodigoBeneficiario(),
                 'nosso_numero'                => $this->getNossoNumero(),
                 'nosso_numero_boleto'         => $this->getNossoNumeroBoleto(),
@@ -1513,5 +1584,4 @@ abstract class AbstractBoleto
             ], $this->variaveis_adicionais
         );
     }
-
 }

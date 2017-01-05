@@ -7,6 +7,13 @@ use Eduardokum\LaravelBoleto\Util;
 
 class Santander  extends AbstractBoleto implements BoletoContract
 {
+
+    public function __construct(array $params = [])
+    {
+        parent::__construct($params);
+        $this->setCamposObrigatorios('numero', 'conta', 'carteira');
+    }
+
     /**
      * Código do banco
      *
@@ -112,20 +119,6 @@ class Santander  extends AbstractBoleto implements BoletoContract
         $this->diasBaixaAutomatica = $baixaAutomatica > 0 ? $baixaAutomatica : 0;
         return $this;
     }
-
-    /**
-     * Método que valida se o banco tem todos os campos obrigadotorios preenchidos
-     */
-    public function isValid()
-    {
-        if($this->numeroDocumento == '' 
-            || $this->conta == '' 
-            || $this->carteira == ''
-        ) {
-            return false;
-        }
-        return true;
-    }
     /**
      * Gera o Nosso Número.
      *
@@ -133,8 +126,9 @@ class Santander  extends AbstractBoleto implements BoletoContract
      */
     protected function gerarNossoNumero()
     {
-        $nossoNumero = Util::numberFormatGeral($this->getNumeroDocumento(), 12);
-        $nossoNumero .= Util::modulo11($this->getNumeroDocumento());
+        $numero_boleto = $this->getNumero();
+        $nossoNumero = Util::numberFormatGeral($numero_boleto, 12);
+        $nossoNumero .= Util::modulo11($numero_boleto);
         return $nossoNumero;
     }
     /**

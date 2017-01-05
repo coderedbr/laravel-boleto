@@ -64,6 +64,13 @@ class Hsbc extends AbstractRemessa implements RemessaContract
     const INSTRUCAO_PROTESTAR_XX_VENC_UTEIS_NAO_PAGO = '76';
     const INSTRUCAO_PROTESTAR_XX_VENC_NAO_PAGO = '84';
 
+    public function __construct(array $params = [])
+    {
+        parent::__construct($params);
+        $this->addCampoObrigatorio('contaDv');
+    }
+
+
     /**
      * Código do banco
      *
@@ -145,7 +152,7 @@ class Hsbc extends AbstractRemessa implements RemessaContract
         $this->add(29, 34, Util::formatCnab('9L', $this->getConta(), 6));
         $this->add(35, 35, Util::formatCnab('9L', $this->getContaDv(), 1));
         $this->add(36, 37, '');
-        $this->add(38, 62, Util::formatCnab('X', $boleto->getNumero(), 25)); // numero de controle
+        $this->add(38, 62, Util::formatCnab('X', $boleto->getNumeroControle(), 25)); // numero de controle
         $this->add(63, 73, Util::formatCnab('9', $boleto->getNossoNumero(), 11));
         $this->add(74, 79, '000000');
         $this->add(80, 90, Util::formatCnab('9', 0, 11, 2));
@@ -216,14 +223,4 @@ class Hsbc extends AbstractRemessa implements RemessaContract
 
         return $this;
     }
-
-    public function isValid()
-    {
-        if ($this->getContaDv() == '' || !parent::isValid()) {
-            return false;
-        }
-
-        return true;
-    }
-
 }

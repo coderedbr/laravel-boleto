@@ -8,6 +8,12 @@ use Eduardokum\LaravelBoleto\Util;
 class Hsbc  extends AbstractBoleto implements BoletoContract
 {
 
+    public function __construct(array $params = [])
+    {
+        parent::__construct($params);
+        $this->addCampoObrigatorio('range', 'contaDv');
+    }
+
     /**
      * Código do banco
      *
@@ -96,16 +102,6 @@ class Hsbc  extends AbstractBoleto implements BoletoContract
         return $agencia . ' / ' . $conta;
     }
     /**
-     * Método que valida se o banco tem todos os campos obrigadotorios preenchidos
-     */
-    public function isValid()
-    {
-        if ($this->range == '' || $this->contaDv == '' || !parent::isValid()) {
-            return false;
-        }
-        return true;
-    }
-    /**
      * Gera o Nosso Número.
      *
      * @return string
@@ -113,9 +109,9 @@ class Hsbc  extends AbstractBoleto implements BoletoContract
     protected function gerarNossoNumero()
     {
         $range = Util::numberFormatGeral($this->getRange(), 5);
-        $numero = Util::numberFormatGeral($this->getNumeroDocumento(), 5);
-        $dv = Util::modulo11($range . $numero, 2, 7);
-        return $range . $numero . $dv;
+        $numero_boleto = Util::numberFormatGeral($this->getNumero(), 5);
+        $dv = Util::modulo11($range . $numero_boleto, 2, 7);
+        return $range . $numero_boleto . $dv;
     }
     /**
      * Método que retorna o nosso numero usado no boleto. alguns bancos possuem algumas diferenças.

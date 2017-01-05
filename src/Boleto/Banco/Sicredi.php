@@ -8,6 +8,12 @@ use Eduardokum\LaravelBoleto\Util;
 class Sicredi extends AbstractBoleto implements BoletoContract
 {
 
+    public function __construct(array $params = [])
+    {
+        parent::__construct($params);
+        $this->addCampoObrigatorio('byte', 'posto');
+    }
+
     /**
      * Local de pagamento
      *
@@ -102,11 +108,14 @@ class Sicredi extends AbstractBoleto implements BoletoContract
     {
         return $this->posto;
     }
+
     /**
      * Define o byte
      *
      * @param  int $byte
+     *
      * @return $this
+     * @throws \Exception
      */
     public function setByte($byte)
     {
@@ -124,16 +133,6 @@ class Sicredi extends AbstractBoleto implements BoletoContract
     public function getByte()
     {
         return $this->byte;
-    }
-    /**
-     * Método que valida se o banco tem todos os campos obrigadotorios preenchidos
-     */
-    public function isValid()
-    {
-        if ($this->byte == '' || $this->posto == '' || !parent::isValid()) {
-            return false;
-        }
-        return true;
     }
     /**
      * Retorna o campo Agência/Beneficiário do boleto
@@ -156,9 +155,9 @@ class Sicredi extends AbstractBoleto implements BoletoContract
         $conta = Util::numberFormatGeral($this->getConta(), 5);
         $ano = $this->getDataDocumento()->format('y');
         $byte = $this->getByte();
-        $numero = Util::numberFormatGeral($this->getNumeroDocumento(), 5);
-        $dv = $agencia . $posto . $conta . $ano . $byte . $numero;
-        $nossoNumero = $ano . $byte . $numero . Util::modulo11($dv);
+        $numero_boleto = Util::numberFormatGeral($this->getNumero(), 5);
+        $dv = $agencia . $posto . $conta . $ano . $byte . $numero_boleto;
+        $nossoNumero = $ano . $byte . $numero_boleto . Util::modulo11($dv);
         return $nossoNumero;
     }
     /**
