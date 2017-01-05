@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>{{ $beneficiario }}</title>
+    <title>{{ $beneficiario['nome'] }}</title>
     <style type="text/css">
         {!! $css !!}
     </style>
@@ -51,7 +51,7 @@
             <tr>
                 <td>
                     <div class="titulo">(=) Valor Documento</div>
-                    <div class="conteudo">{{ $valor_documento }}</div>
+                    <div class="conteudo">{{ $valor }}</div>
                 </td>
             </tr>
             <tr>

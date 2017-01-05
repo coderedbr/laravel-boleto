@@ -21,7 +21,7 @@
         </ul>
         <span class="header">Linha Digitável: {{ $linha_digitavel }}</span>
         <span class="header">Número: {{ $numero }}</span>
-        {!! $valor_documento ? '<span class="header">Valor: R$ ' . $valor_documento . '</span>' : '' !!}
+        {!! $valor ? '<span class="header">Valor: R$ ' . $valor . '</span>' : '' !!}
         <br>
         <div class="linha-pontilhada" style="margin-bottom: 20px;">Recibo do sacado</div>
     </div>
@@ -51,11 +51,11 @@
         <tr>
             <td width="520" colspan="4">
                 <div class="titulo">Pagador</div>
-                <div class="conteudo">{{ $pagador }}</div>
+                <div class="conteudo">{{ $pagador['nome'] }}</div>
             </td>
             <td>
                 <div class="titulo">CPF/CNPJ do Pagador</div>
-                <div class="conteudo rtl">{{ $pagador_documento }}</div>
+                <div class="conteudo rtl">{{ $pagador['documento'] }}</div>
             </td>
         </tr>
         <tr>
@@ -79,21 +79,21 @@
         <tr>
             <td colspan="2">
                 <div class="titulo">Beneficiário</div>
-                <div class="conteudo">{{ $beneficiario }}</div>
+                <div class="conteudo">{{ $beneficiario['nome'] }}</div>
             </td>
             <td colspan="2">
                 <div class="titulo">CPF/CNPJ do Beneficiário</div>
-                <div class="conteudo">{{ $beneficiario_cpf_cnpj }}</div>
+                <div class="conteudo">{{ $beneficiario['documento'] }}</div>
             </td>
             <td width="130" class="caixa-gray-bg">
                 <div class="titulo">Valor do Documento</div>
-                <div class="conteudo rtl">{{ $valor_documento }}</div>
+                <div class="conteudo rtl">{{ $valor }}</div>
             </td>
         </tr>
         <tr>
             <td colspan="4">
                 <div class="titulo">Endereço do Beneficiário</div>
-                <div class="conteudo">{{ $beneficiario_endereco1 }} | {{ $beneficiario_endereco2 }}</div>
+                <div class="conteudo">{{ $beneficiario['endereco'] }} | {{ $beneficiario['endereco2'] }}</div>
             </td>
             <td width="130">
                 <div class="titulo">(-) Descontos / Abatimentos</div>
