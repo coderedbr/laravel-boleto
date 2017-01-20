@@ -92,8 +92,8 @@ class Bb extends AbstractBoleto implements BoletoContract
      */
     public function isValid()
     {
-        if ($this->numeroDocumento == '' 
-            || $this->convenio == '' 
+        if ($this->numeroDocumento == ''
+            || $this->convenio == ''
             || $this->carteira == ''
         ) {
             return false;
@@ -122,7 +122,11 @@ class Bb extends AbstractBoleto implements BoletoContract
             }
             break;
         case 7:
-            $numero = Util::numberFormatGeral($convenio, 7) . Util::numberFormatGeral($numero_boleto, 10);
+            if ( $this->getCarteira() == '31') {
+                $numero = Util::numberFormatGeral(substr($numero_boleto, 0, -1), 10);
+            } else {
+                $numero = Util::numberFormatGeral($convenio, 7) . Util::numberFormatGeral($numero_boleto, 10);
+            }
             break;
         default:
             throw new \Exception('O código do convênio precisa ter 4, 6 ou 7 dígitos!');
