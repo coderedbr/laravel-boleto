@@ -123,7 +123,7 @@ class Bb extends AbstractBoleto implements BoletoContract
             break;
         case 7:
             if ( $this->getCarteira() == '31') {
-                $numero = Util::numberFormatGeral(substr($numero_boleto, 0, -1), 10);
+                $numero = Util::numberFormatGeral($numero_boleto, 10);
             } else {
                 $numero = Util::numberFormatGeral($convenio, 7) . Util::numberFormatGeral($numero_boleto, 10);
             }
